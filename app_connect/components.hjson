@@ -1,0 +1,138 @@
+{
+  components: [
+    {
+      type: 'dmx-session-tracker',
+      selector : 'dmx-session-tracker, [is=dmx-session-tracker]',
+      groupTitle : 'Session',
+      groupIcon : 'fa fa-lg fa-clock-o',
+      title : 'Session Tracker: @@id@@',
+      icon : 'fa fa-lg fa-clock-o',
+      state : 'opened',
+      anyParent: true,
+      template: '<dmx-session-tracker id="@@id@@"></dmx-session-tracker>',
+      baseName: 'session',
+      help: 'Tracks user session events and timeout.',
+      properties : [
+        {
+          "group": "Session tracker Properties",
+          "variables": [
+            {
+              "name": "theId",
+              "attribute": "id",
+              "title": "ID",
+              "type": "text",
+              "defaultValue": "",
+              "required": true
+            },
+          ]
+        },
+        {
+          group: 'Timeout',
+          variables: [
+            { name: 'max_idle_time', attribute: 'max_idle_time', title: 'Max Idle time (seconds)', type: 'text', "dataBindings": true, defaultValue: '300' },
+            { name: 'idle_warn_time', attribute: 'idle_warn_time', title: 'Notify timeout (seconds)', type: 'text', "dataBindings": true, defaultValue: '240' }
+          ]
+        },
+        {
+          group: 'Enable Events',
+          variables: [
+            { name: 'enable_keydown', attribute: 'enable_keydown', title: 'Keydown', type: 'boolean', defaultValue: false },
+            { name: 'enable_click', attribute: 'enable_click', title: 'Click', type: 'boolean', defaultValue: false },
+            { name: 'enable_scroll', attribute: 'enable_scroll', title: 'Scroll', type: 'boolean', defaultValue: false },
+            { name: 'enable_input', attribute: 'enable_input', title: 'Input', type: 'boolean', defaultValue: false }
+          ]
+        }
+      ],
+      actionsScheme:[
+        {
+          "addTitle": "Reset",
+          "title": "Reset",
+          "name": "reset",
+          "icon": "fa fa-lg fa-times-circle-o",
+          "state": "opened",
+          "help": "Reset the tracker"
+        }
+      ]
+      children: [],
+      allowed_children: {},
+      copyFiles: [
+        {src: 'dmx-session-tracker.js', dst: 'js/dmx-session-tracker.js'}
+      ],
+      linkFiles: [
+        {src: 'js/dmx-session-tracker.js', type: 'js', defer: true}
+      ],
+      cssOrder: [],
+      jsOrder: []
+    }
+  ],
+  attributes: [],
+  events: [
+    {
+      name: 'dmx-session-tracker-timeout',
+      attributeStartsWith: 'dmx-on',
+      attribute: 'timeout',
+      title: 'Timeout',
+      type: 'boolean',
+      display: 'fieldset',
+      icon: 'fa fa-lg fa-chevron-right',
+      groupTitle: 'Session Timeout',
+      groupIcon: 'fa fa-lg fa-cubes',
+      defaultValue: false,
+      show: ['timedOut'],
+      noChangeOnHide: true,
+      groupEnabler: true,
+      children: [
+        {
+          name: 'timedOut',
+          attributeStartsWith: 'dmx-on',
+          attribute: 'timeout',
+          isValue: true,
+          actionsPicker: true,
+          title: 'Action:',
+          type: 'text',
+          help: 'Choose the action to execute.',
+          defaultValue: '',
+          initDisplay: 'none' //,
+          required: true
+        }
+      ],
+      allowedOn: {
+        'dmx-session-tracker' : true
+      }
+    },
+    {
+      name: 'dmx-session-tracker-notify',
+      attributeStartsWith: 'dmx-on',
+      attribute: 'notify',
+      title: 'Notify',
+      type: 'boolean',
+      display: 'fieldset',
+      icon: 'fa fa-lg fa-chevron-right',
+      groupTitle: 'Session Timeout',
+      groupIcon: 'fa fa-lg fa-cubes',
+      defaultValue: false,
+      show: ['notificationManager'],
+      noChangeOnHide: true,
+      groupEnabler: true,
+      children: [
+        {
+          name: 'notificationManager',
+          attributeStartsWith: 'dmx-on',
+          attribute: 'notify',
+          isValue: true,
+          actionsPicker: true,
+          title: 'Action:',
+          type: 'text',
+          help: 'Choose the action to execute.',
+          defaultValue: '',
+          initDisplay: 'none' //,
+          required: true
+        }
+      ],
+      allowedOn: {
+        'dmx-session-tracker' : true
+      }
+    },
+  ],
+  static_events: []
+}
