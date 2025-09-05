@@ -22,24 +22,25 @@
               "title": "ID",
               "type": "text",
               "defaultValue": "",
-              "required": true
+              "required": true,
+              "help": "Unique identifier for the component"
             },
           ]
         },
         {
           group: 'Timeout',
           variables: [
-            { name: 'max_idle_time', attribute: 'max_idle_time', title: 'Max Idle time (seconds)', type: 'text', "dataBindings": true, defaultValue: '300' },
-            { name: 'idle_warn_time', attribute: 'idle_warn_time', title: 'Notify timeout (seconds)', type: 'text', "dataBindings": true, defaultValue: '240' }
+            { name: 'max_idle_time', attribute: 'max_idle_time', title: 'Max Idle time (seconds)', type: 'text', "dataBindings": true, defaultValue: '300', help: 'Maximum idle time in seconds before the session times out' },
+            { name: 'idle_warn_time', attribute: 'idle_warn_time', title: 'Notify timeout (seconds)', type: 'text', "dataBindings": true, defaultValue: '240', help: 'Time in seconds before timeout to trigger the notify event' }
           ]
         },
         {
           group: 'Enable Events',
           variables: [
-            { name: 'enable_keydown', attribute: 'enable_keydown', title: 'Keydown', type: 'boolean', defaultValue: false },
-            { name: 'enable_click', attribute: 'enable_click', title: 'Click', type: 'boolean', defaultValue: false },
-            { name: 'enable_scroll', attribute: 'enable_scroll', title: 'Scroll', type: 'boolean', defaultValue: false },
-            { name: 'enable_input', attribute: 'enable_input', title: 'Input', type: 'boolean', defaultValue: false }
+            { name: 'enable_keydown', attribute: 'enable_keydown', title: 'Keydown', type: 'boolean', defaultValue: false, help: 'Enable tracking keydown events as user activity' },
+            { name: 'enable_click', attribute: 'enable_click', title: 'Click', type: 'boolean', defaultValue: false, help: 'Enable tracking click events as user activity' },
+            { name: 'enable_scroll', attribute: 'enable_scroll', title: 'Scroll', type: 'boolean', defaultValue: false, help: 'Enable tracking scroll events as user activity' },
+            { name: 'enable_input', attribute: 'enable_input', title: 'Input', type: 'boolean', defaultValue: false, help: 'Enable tracking input events as user activity' }
           ]
         }
       ],
@@ -81,6 +82,7 @@
       show: ['timedOut'],
       noChangeOnHide: true,
       groupEnabler: true,
+      help: 'Event fired when the session times out due to inactivity',
       children: [
         {
           name: 'timedOut',
@@ -114,6 +116,7 @@
       show: ['notificationManager'],
       noChangeOnHide: true,
       groupEnabler: true,
+      help: 'Event fired when approaching the timeout threshold',
       children: [
         {
           name: 'notificationManager',
