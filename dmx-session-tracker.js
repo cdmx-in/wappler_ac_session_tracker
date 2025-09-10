@@ -48,9 +48,9 @@ dmx.Component('session-tracker', {
 
     this.set("trackEvents", this.trackEvents);
 
-    if (this.trackEvents.length !== 0) {
-      this.setupInactivityTimer();
-    }
+    // if (this.trackEvents.length !== 0) {
+    //   this.setupInactivityTimer();
+    // }
 
   },
 
@@ -94,6 +94,7 @@ dmx.Component('session-tracker', {
       dmx.nextTick(function () {
         this.dispatchEvent("notify");
       }, context);
+      context.set("remaining", context.props.max_idle_time - context.props.idle_warn_time);
     }, context.props.idle_warn_time * 1000);
 
     // Hard redirect at 60s if confirm ignored

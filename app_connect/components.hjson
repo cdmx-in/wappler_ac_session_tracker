@@ -12,6 +12,14 @@
       template: '<dmx-session-tracker id="@@id@@"></dmx-session-tracker>',
       baseName: 'session',
       help: 'Tracks user session events and timeout.',
+      "dataPick": true,
+      "dataScheme": [
+        {
+              "name": "remaining",
+              "title": "remaining",
+              "type": "number"
+            }
+      ],
       properties : [
         {
           "group": "Session tracker Properties",
