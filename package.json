@@ -5,8 +5,8 @@
     "description": "App Connect module for Session Tracking.",
     "license": "MIT",
     "author": {
-        "name": "cdmx1",
-        "url": "https://github.com/cdmx1"
+        "name": "cdmx-in",
+        "url": "https://github.com/cdmx-in"
     },
     "keywords": [
         "wappler-extension",
