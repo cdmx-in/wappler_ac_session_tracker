@@ -47,10 +47,7 @@ dmx.Component('session-tracker', {
     }
 
     this.set("trackEvents", this.trackEvents);
-
-    // if (this.trackEvents.length !== 0) {
-    //   this.setupInactivityTimer();
-    // }
+    this.setupInactivityTimer();
 
   },
 
@@ -86,15 +83,35 @@ dmx.Component('session-tracker', {
     clearTimeout(context.redirectTimeout);
   },
 
+  _setInterval: function (context) {
+    context._clearInterval(context);
+
+    context.notifyInterval = setInterval(() => {
+      console.log("tick", context.data.remaining);
+      const countdown = context.data.remaining;
+      if (countdown > 0) {
+        context.set("remaining", countdown - 1);
+      } else {
+        context._clearInterval(context);
+      }
+    }, 1000);
+
+  },
+
+  _clearInterval: function (context) {
+    clearInterval(context.notifyInterval);
+  },
+
   _startTimers: function (context) {
     context._clearTimers(context);
 
     // Show confirm at idle_warn_time
     context.warningTimeout = setTimeout(() => {
       dmx.nextTick(function () {
+        this.set("remaining", this.props.max_idle_time - this.props.idle_warn_time);
+        this._setInterval(this);
         this.dispatchEvent("notify");
       }, context);
-      context.set("remaining", context.props.max_idle_time - context.props.idle_warn_time);
     }, context.props.idle_warn_time * 1000);
 
     // Hard redirect at 60s if confirm ignored
