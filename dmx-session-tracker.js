@@ -28,8 +28,6 @@ dmx.Component('session-tracker', {
   init() {
     this.trackEvents = [];
 
-    // console.log("Props:", this.props);
-
     if (this.props.enable_keydown) {
       this.trackEvents.push('keydown');
     }
@@ -67,8 +65,6 @@ dmx.Component('session-tracker', {
       this._startTimers(this);
     }
 
-    console.log(this);
-
     // Attach activity listeners
     this.trackEvents.forEach(evt => {
       window.addEventListener(evt, resetOnActivity, true);
@@ -87,7 +83,6 @@ dmx.Component('session-tracker', {
     context._clearInterval(context);
 
     context.notifyInterval = setInterval(() => {
-      console.log("tick", context.data.remaining);
       const countdown = context.data.remaining;
       if (countdown > 0) {
         context.set("remaining", countdown - 1);
