@@ -144,6 +144,40 @@
         'dmx-session-tracker' : true
       }
     },
+    {
+      name: 'dmx-session-tracker-reset',
+      attributeStartsWith: 'dmx-on',
+      attribute: 'reset',
+      title: 'Reset',
+      type: 'boolean',
+      display: 'fieldset',
+      icon: 'fa fa-lg fa-chevron-right',
+      groupTitle: 'Session Timeout',
+      groupIcon: 'fa fa-lg fa-cubes',
+      defaultValue: false,
+      show: ['resetManager'],
+      noChangeOnHide: true,
+      groupEnabler: true,
+      help: 'Event fired when timer is reset',
+      children: [
+        {
+          name: 'resetManager',
+          attributeStartsWith: 'dmx-on',
+          attribute: 'reset',
+          isValue: true,
+          actionsPicker: true,
+          title: 'Action:',
+          type: 'text',
+          help: 'Choose the action to execute.',
+          defaultValue: '',
+          initDisplay: 'none' //,
+          required: true
+        }
+      ],
+      allowedOn: {
+        'dmx-session-tracker' : true
+      }
+    },
   ],
   static_events: []
 }

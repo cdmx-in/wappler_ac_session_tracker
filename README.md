@@ -33,3 +33,4 @@ Properties available as attributes on the component element.
 
 - Timeout: Fired when the session times out
 - Notify: Fired when approaching timeout
+- Reset: Fired when timers are reset.

@@ -16,13 +16,17 @@ dmx.Component('session-tracker', {
 
   methods: {
     reset: function () {
+      dmx.nextTick(function () {
+        this.dispatchEvent("reset");
+      }, this);
       this._startTimers(this);
     }
   },
 
   events: {
     timeout: Event,
-    notify: Event
+    notify: Event,
+    reset: Event
   },
 
   init() {
@@ -60,6 +64,10 @@ dmx.Component('session-tracker', {
     const resetOnActivity = (e) => {
       // Ignore pure mouse movements
       if (e.type === "mousemove") return;
+
+      dmx.nextTick(function () {
+        this.dispatchEvent("reset");
+      }, this);
 
       // Reset inactivity cycle
       this._startTimers(this);
