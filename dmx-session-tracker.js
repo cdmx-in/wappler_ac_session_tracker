@@ -73,6 +73,8 @@ dmx.Component('session-tracker', {
       // Ignore pure mouse movements
       if (e.type === "mousemove") return;
 
+      this._setCookie();
+
       dmx.nextTick(function () {
         this.dispatchEvent("reset");
       }, this);
