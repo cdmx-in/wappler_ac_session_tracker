@@ -16,6 +16,7 @@ dmx.Component('session-tracker', {
 
   methods: {
     reset: function () {
+      this._setCookie();
       dmx.nextTick(function () {
         this.dispatchEvent("reset");
       }, this);
@@ -48,9 +49,16 @@ dmx.Component('session-tracker', {
       this.trackEvents.push('input');
     }
 
+    this._setCookie();
+
     this.set("trackEvents", this.trackEvents);
     this.setupInactivityTimer();
 
+  },
+
+  _setCookie() {
+    const expiresAt = new Date(Date.now() + this.props.max_idle_time * 1000).toUTCString();
+    document.cookie = `ss_exp=${Date.now() + this.props.max_idle_time * 1000}; expires=${expiresAt}; path=/; SameSite=Lax`;
   },
 
   destroy() {
@@ -84,7 +92,7 @@ dmx.Component('session-tracker', {
 
   _clearTimers(context) {
     clearTimeout(context.warningTimeout);
-    clearTimeout(context.redirectTimeout);
+    clearTimeout(context.sessionTimeout);
   },
 
   _setInterval: function (context) {
@@ -106,23 +114,73 @@ dmx.Component('session-tracker', {
   },
 
   _startTimers: function (context) {
-    context._clearTimers(context);
 
-    // Show confirm at idle_warn_time
-    context.warningTimeout = setTimeout(() => {
-      dmx.nextTick(function () {
-        this.set("remaining", this.props.max_idle_time - this.props.idle_warn_time);
-        this._setInterval(this);
-        this.dispatchEvent("notify");
-      }, context);
-    }, context.props.idle_warn_time * 1000);
+    const maxIdleTime = context.props.max_idle_time;
+    const idleWarnTime = context.props.idle_warn_time;
 
-    // Hard redirect at 60s if confirm ignored
-    context.redirectTimeout = setTimeout(() => {
-      dmx.nextTick(function () {
-        this.dispatchEvent("timeout");
-      }, context);
-    }, context.props.max_idle_time * 1000);
+    if (idleWarnTime >= maxIdleTime) {
+      console.warn("idle_warn_time should be less than max_idle_time");
+      return;
+    }
+
+    const cookies = document.cookie.split(';').map(c => c.trim());
+    const expiryCookie = cookies.find(c => c.startsWith('ss_exp='));
+    const remainingTime = maxIdleTime - idleWarnTime;
+
+    let warningTimeoutTime = idleWarnTime * 1000;
+    let timeoutTime = maxIdleTime * 1000;
+
+    if (expiryCookie) {
+      context._clearTimers(context);
+
+      const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+      if (expiresIn <= remainingTime) {
+        dmx.nextTick(function () {
+          const cookies = document.cookie.split(';').map(c => c.trim());
+          const expiryCookie = cookies.find(c => c.startsWith('ss_exp='));
+          const remainingTime = maxIdleTime - idleWarnTime;
+          const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+          if (expiresIn <= remainingTime) {
+            this.set("remaining", remainingTime);
+            this._setInterval(this);
+            this.dispatchEvent("notify");
+          } else {
+            this._startTimers(this);
+          }
+        }, context);
+
+        timeoutTime = expiresIn * 1000;
+
+      } else {
+        const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+        warningTimeoutTime = (expiresIn - remainingTime) * 1000;
+        timeoutTime = expiresIn * 1000;
+        // Show confirm at idle_warn_time
+        context.warningTimeout = setTimeout(() => {
+          dmx.nextTick(function () {
+            const cookies = document.cookie.split(';').map(c => c.trim());
+            const expiryCookie = cookies.find(c => c.startsWith('ss_exp='));
+            const remainingTime = maxIdleTime - idleWarnTime;
+            const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+            if (expiresIn <= remainingTime) {
+              this.set("remaining", remainingTime);
+              this._setInterval(this);
+              this.dispatchEvent("notify");
+            } else {
+              this._startTimers(this);
+            }
+          }, context);
+        }, warningTimeoutTime);
+      }
+
+      // Hard redirect at 60s if confirm ignored
+      context.sessionTimeout = setTimeout(() => {
+        dmx.nextTick(function () {
+          this.dispatchEvent("timeout");
+        }, context);
+      }, timeoutTime);
+    }
+
   },
 
   performUpdate: function (updatedProps) {
