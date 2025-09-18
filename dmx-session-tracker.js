@@ -17,9 +17,7 @@ dmx.Component('session-tracker', {
   methods: {
     reset: function () {
       this._setCookie();
-      dmx.nextTick(function () {
-        this.dispatchEvent("reset");
-      }, this);
+      this._debouncedReset();
       this._startTimers(this);
     }
   },
@@ -32,26 +30,15 @@ dmx.Component('session-tracker', {
 
   init() {
     this.trackEvents = [];
+    this._debounceTimer = null;
+    this._timeoutTimer = null;
+    this._notifyTimer = null;
+    this.warningTimeout = null;
+    this.sessionTimeout = null;
+    this.notifyInterval = null;
 
-    if (this.props.enable_keydown) {
-      this.trackEvents.push('keydown');
-    }
-
-    if (this.props.enable_click) {
-      this.trackEvents.push('click');
-    }
-
-    if (this.props.enable_scroll) {
-      this.trackEvents.push('scroll');
-    }
-
-    if (this.props.enable_input) {
-      this.trackEvents.push('input');
-    }
-
+    // Setup inactivity timer
     this._setCookie();
-
-    this.set("trackEvents", this.trackEvents);
     this.setupInactivityTimer();
 
   },
@@ -67,6 +54,15 @@ dmx.Component('session-tracker', {
     ['click', 'keydown', 'scroll', 'input'].forEach(evt => window.removeEventListener(evt, this.activityHandler));
   },
 
+  _debouncedReset() {
+    clearTimeout(this._debounceTimer);
+    this._debounceTimer = setTimeout(() => {
+      dmx.nextTick(function () {
+        this.dispatchEvent("reset");
+      }, this);
+    }, 5000);
+  },
+
   setupInactivityTimer() {
     // Activity handler (reset timer on real activity)
     const resetOnActivity = (e) => {
@@ -74,19 +70,39 @@ dmx.Component('session-tracker', {
       if (e.type === "mousemove") return;
 
       this._setCookie();
-
-      dmx.nextTick(function () {
-        this.dispatchEvent("reset");
-      }, this);
+      this._debouncedReset();
 
       // Reset inactivity cycle
       this._startTimers(this);
     }
 
-    // Attach activity listeners
-    this.trackEvents.forEach(evt => {
-      window.addEventListener(evt, resetOnActivity, true);
-    });
+    const handleKeydown = (e) => {
+      // Ignore pure modifier keys
+      if (["Shift", "Alt", "Control", "Meta"].includes(e.key)) return;
+      resetOnActivity();
+    }
+
+    if (this.props.enable_keydown) {
+      window.addEventListener('keydown', handleKeydown, true);
+      this.trackEvents.push('keydown');
+    }
+
+    if (this.props.enable_click) {
+      window.addEventListener('click', resetOnActivity, true);
+      this.trackEvents.push('click');
+    }
+
+    if (this.props.enable_scroll) {
+      window.addEventListener('scroll', resetOnActivity, { capture: true, passive: true });
+      this.trackEvents.push('scroll');
+    }
+
+    if (this.props.enable_input) {
+      window.addEventListener('input', resetOnActivity, true);
+      this.trackEvents.push('input');
+    }
+
+    this.set("trackEvents", this.trackEvents);
 
     // Start initial cycle
     this._startTimers(this);
