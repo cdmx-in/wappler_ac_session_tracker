@@ -12,7 +12,7 @@ dmx.Component('session-tracker', {
     enable_input: { type: Boolean, default: false },
     max_idle_time: { type: Number, default: 300 },
     idle_warn_time: { type: Number, default: 240 },
-    debounce_timeout: { type: Number, default: 5 },
+    debounce_time: { type: Number, default: 5 },
     cookie_name: { type: String, default: 'ss_exp' },
 
   },
@@ -67,7 +67,7 @@ dmx.Component('session-tracker', {
       dmx.nextTick(function () {
         this.dispatchEvent("reset");
       }, this);
-    }, this.props.debounce_timeout * 1000);
+    }, this.props.debounce_time * 1000);
   },
 
   setupInactivityTimer() {

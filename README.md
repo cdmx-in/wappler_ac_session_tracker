@@ -20,7 +20,8 @@ Properties available as attributes on the component element.
 
 - ID: Unique identifier for the component
 - Max Idle time (seconds): Total time of inactivity before session timeout
-- Notify timeout (seconds): Time remaining when to notify before timeout
+- Notify timeout (seconds): Time of inactivity after which the notify event is triggered.
+- Debounce time (seconds): Interval in seconds to dispatching reset event after activity.
 - Keydown: Enable tracking keydown events as activity
 - Click: Enable tracking click events as activity
 - Scroll: Enable tracking scroll events as activity

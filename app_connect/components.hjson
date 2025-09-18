@@ -49,7 +49,7 @@
           variables: [
             { name: 'max_idle_time', attribute: 'max_idle_time', title: 'Max Idle time (seconds)', type: 'text', "dataBindings": true, defaultValue: '300', help: 'Maximum idle time in seconds before the session times out' },
             { name: 'idle_warn_time', attribute: 'idle_warn_time', title: 'Notify timeout (seconds)', type: 'text', "dataBindings": true, defaultValue: '240', help: 'Time in seconds of inactivity after which the notify event is triggered.' }
-            { name: 'debounce_timeout', attribute: 'debounce_timeout', title: 'Debounce timeout (seconds)', type: 'text', "dataBindings": true, defaultValue: '5', help: 'Interval in seconds to dispatching reset event after activity' }
+            { name: 'debounce_time', attribute: 'debounce_time', title: 'Debounce time (seconds)', type: 'text', "dataBindings": true, defaultValue: '5', help: 'Interval in seconds to dispatching reset event after activity' }
           ]
         },
         {
