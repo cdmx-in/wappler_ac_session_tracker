@@ -1,6 +1,6 @@
 {
     "name": "@cdmx/wappler_ac_session_tracker",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "type": "module",
     "description": "App Connect module for Session Tracking.",
     "license": "MIT",
