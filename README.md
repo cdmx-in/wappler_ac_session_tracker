@@ -13,7 +13,7 @@ The Session Tracker component monitors user activity and dispatches events when 
 ## Component
 
 ### Session Tracker
-Tracks user session events and timeout. A compact component that tracks activity and fires notify and timeout events. It supports enabling/disabling which activity event types should reset the timers.
+Tracks user session events and timeout. A compact component that tracks activity and fires notify and timeout events. It supports enabling/disabling which activity event types should reset the timers. Shift, Alt, Control, Meta are ignored on keydown event so they won't be counted as activity and moving mouse cursor is also not counted as activity
 
 ## Properties
 Properties available as attributes on the component element.

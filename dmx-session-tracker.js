@@ -60,9 +60,7 @@ dmx.Component('session-tracker', {
   },
 
   _debouncedReset() {
-    console.log("Before clear", this._debounceTimer);
     clearTimeout(this._debounceTimer);
-    console.log("After clear", this._debounceTimer);
     this._debounceTimer = setTimeout(() => {
       dmx.nextTick(function () {
         this.dispatchEvent("reset");
@@ -73,7 +71,6 @@ dmx.Component('session-tracker', {
   setupInactivityTimer() {
     // Activity handler (reset timer on real activity)
     const resetOnActivity = (e) => {
-      console.log("resetOnActivity", e, this);
       // Ignore pure mouse movements
       if (e.type === "mousemove") return;
 
@@ -87,7 +84,6 @@ dmx.Component('session-tracker', {
     const handleKeydown = (e) => {
       // Ignore pure modifier keys
       if (["Shift", "Alt", "Control", "Meta"].includes(e.key)) return;
-      console.log("keydown");
       resetOnActivity(e);
     }
 
@@ -127,6 +123,22 @@ dmx.Component('session-tracker', {
 
     context.notifyInterval = setInterval(() => {
       const countdown = context.data.remaining;
+      const maxIdleTime = context.props.max_idle_time;
+      const idleWarnTime = context.props.idle_warn_time;
+      const cookies = document.cookie.split(';').map(c => c.trim());
+      const expiryCookie = cookies.find(c => c.startsWith(`${context.props.cookie_name}=`));
+      const remainingTime = parseInt(maxIdleTime - idleWarnTime);
+      const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+
+      if (expiresIn > remainingTime) {
+        // User has reset during countdown
+        context.set("remaining", null);
+        context._clearInterval(context);
+        context._startTimers(context);
+        return;
+      }
+
+
       if (countdown > 0) {
         context.set("remaining", countdown - 1);
       } else {
@@ -187,7 +199,7 @@ dmx.Component('session-tracker', {
           dmx.nextTick(function () {
             const cookies = document.cookie.split(';').map(c => c.trim());
             const expiryCookie = cookies.find(c => c.startsWith(`${this.props.cookie_name}=`));
-            const remainingTime = maxIdleTime - idleWarnTime;
+            const remainingTime = parseInt(maxIdleTime - idleWarnTime);
             const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
             if (expiresIn <= remainingTime) {
               this.set("remaining", remainingTime);
