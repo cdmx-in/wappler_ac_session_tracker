@@ -20,6 +20,7 @@ dmx.Component('session-tracker', {
   methods: {
     reset: function () {
       this._setCookie();
+      this.trackEvents.forEach(evt => evt.add());
       dmx.nextTick(function () {
         this.dispatchEvent("reset");
       }, this);
@@ -88,26 +89,40 @@ dmx.Component('session-tracker', {
     }
 
     if (this.props.enable_keydown) {
-      window.addEventListener('keydown', handleKeydown, true);
-      this.trackEvents.push('keydown');
+      this.trackEvents.push(
+        {
+          'add': () => window.addEventListener('keydown', handleKeydown, true),
+          'remove': () => window.removeEventListener('keydown', handleKeydown, true)
+        });
     }
 
     if (this.props.enable_click) {
-      window.addEventListener('click', resetOnActivity, true);
-      this.trackEvents.push('click');
+      this.trackEvents.push(
+        {
+          'add': () => window.addEventListener('click', resetOnActivity, true),
+          'remove': () => window.removeEventListener('click', resetOnActivity, true)
+        });
     }
 
     if (this.props.enable_scroll) {
-      window.addEventListener('scroll', resetOnActivity, { capture: true, passive: true });
-      this.trackEvents.push('scroll');
+      this.trackEvents.push(
+        {
+          'add': () => window.addEventListener('scroll', resetOnActivity, { capture: true, passive: true }),
+          'remove': () => window.removeEventListener('scroll', resetOnActivity, { capture: true, passive: true })
+        });
     }
 
     if (this.props.enable_input) {
-      window.addEventListener('input', resetOnActivity, true);
-      this.trackEvents.push('input');
+      this.trackEvents.push(
+        {
+          'add': () => window.addEventListener('input', resetOnActivity, true),
+          'remove': () => window.removeEventListener('input', resetOnActivity, true)
+        });
     }
 
-    this.set("trackEvents", this.trackEvents);
+    // this.set("trackEvents", this.trackEvents);
+
+    this.trackEvents.forEach(evt => evt.add());
 
     // Start initial cycle
     this._startTimers(this);
@@ -128,6 +143,11 @@ dmx.Component('session-tracker', {
       const cookies = document.cookie.split(';').map(c => c.trim());
       const expiryCookie = cookies.find(c => c.startsWith(`${context.props.cookie_name}=`));
       const remainingTime = parseInt(maxIdleTime - idleWarnTime);
+      if (!expiryCookie) {
+        context.set("remaining", null);
+        context._clearInterval(context);
+        return;
+      }
       const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
 
       if (expiresIn > remainingTime) {
@@ -140,7 +160,7 @@ dmx.Component('session-tracker', {
 
 
       if (countdown > 0) {
-        context.set("remaining", countdown - 1);
+        context.set("remaining", parseInt(expiresIn));
       } else {
         context._clearInterval(context);
       }
@@ -164,7 +184,7 @@ dmx.Component('session-tracker', {
 
     const cookies = document.cookie.split(';').map(c => c.trim());
     const expiryCookie = cookies.find(c => c.startsWith(`${context.props.cookie_name}=`));
-    const remainingTime = maxIdleTime - idleWarnTime;
+    const remainingTime = parseInt(maxIdleTime - idleWarnTime);
 
     let warningTimeoutTime = idleWarnTime * 1000;
     let timeoutTime = maxIdleTime * 1000;
@@ -177,14 +197,16 @@ dmx.Component('session-tracker', {
         dmx.nextTick(function () {
           const cookies = document.cookie.split(';').map(c => c.trim());
           const expiryCookie = cookies.find(c => c.startsWith(`${this.props.cookie_name}=`));
-          const remainingTime = maxIdleTime - idleWarnTime;
-          const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
-          if (expiresIn <= remainingTime) {
-            this.set("remaining", remainingTime);
-            this._setInterval(this);
-            this.dispatchEvent("notify");
-          } else {
-            this._startTimers(this);
+          const remainingTime = parseInt(maxIdleTime - idleWarnTime);
+          if (expiryCookie) {
+            const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+            if (expiresIn <= remainingTime) {
+              this.set("remaining", remainingTime);
+              this._setInterval(this);
+              this.dispatchEvent("notify");
+            } else {
+              this._startTimers(this);
+            }
           }
         }, context);
 
@@ -200,13 +222,16 @@ dmx.Component('session-tracker', {
             const cookies = document.cookie.split(';').map(c => c.trim());
             const expiryCookie = cookies.find(c => c.startsWith(`${this.props.cookie_name}=`));
             const remainingTime = parseInt(maxIdleTime - idleWarnTime);
-            const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
-            if (expiresIn <= remainingTime) {
-              this.set("remaining", remainingTime);
-              this._setInterval(this);
-              this.dispatchEvent("notify");
-            } else {
-              this._startTimers(this);
+            if (expiryCookie) {
+              const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+              if (expiresIn <= remainingTime) {
+                this.set("remaining", remainingTime);
+                this._setInterval(this);
+                this.trackEvents.forEach(evt => evt.remove());
+                this.dispatchEvent("notify");
+              } else {
+                this._startTimers(this);
+              }
             }
           }, context);
         }, warningTimeoutTime);
@@ -215,6 +240,7 @@ dmx.Component('session-tracker', {
       // Hard redirect at 60s if confirm ignored
       context.sessionTimeout = setTimeout(() => {
         dmx.nextTick(function () {
+          this.trackEvents.forEach(evt => evt.remove());
           this.dispatchEvent("timeout");
         }, context);
       }, timeoutTime);
