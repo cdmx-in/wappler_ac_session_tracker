@@ -25,6 +25,12 @@ dmx.Component('session-tracker', {
         this.dispatchEvent("reset");
       }, this);
       this._startTimers(this);
+    },
+    clear: function () {
+      this._clearCookie();
+    },
+    destroy: function () {
+      this._destroy();
     }
   },
 
@@ -54,10 +60,14 @@ dmx.Component('session-tracker', {
     document.cookie = `${this.props.cookie_name}=${Date.now() + this.props.max_idle_time * 1000}; expires=${expiresAt}; path=/; SameSite=Lax`;
   },
 
-  destroy() {
-    clearTimeout(this._timeoutTimer);
-    clearTimeout(this._notifyTimer);
-    ['click', 'keydown', 'scroll', 'input'].forEach(evt => window.removeEventListener(evt, this.activityHandler));
+  _destroy() {
+    this._clearTimers(this);
+    this._clearInterval(this);
+    this.trackEvents.forEach(evt => evt.remove());
+  },
+
+  _clearCookie() {
+    document.cookie = `${this.props.cookie_name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
   },
 
   _debouncedReset() {

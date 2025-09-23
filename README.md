@@ -29,6 +29,8 @@ Properties available as attributes on the component element.
 
 ### Session tracker (`session-tracker`)
 - Reset: Reset the tracker
+- Clear: Clear the cookie
+- Destroy: Destroy the tracker
 
 ## Events
 

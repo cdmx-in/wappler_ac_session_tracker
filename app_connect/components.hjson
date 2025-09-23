@@ -70,7 +70,24 @@
           "icon": "fa fa-lg fa-times-circle-o",
           "state": "opened",
           "help": "Reset the tracker"
-        }
+        },
+        {
+          "addTitle": "Clear",
+          "title": "Clear",
+          "name": "clear",
+          "icon": "fa fa-lg fa-times-circle-o",
+          "state": "opened",
+          "help": "Clear the cookie"
+        },
+        {
+          "addTitle": "Destroy",
+          "title": "Destroy",
+          "name": "destroy",
+          "icon": "fa fa-lg fa-trash",
+          "state": "opened",
+          "help": "Destroy the tracker"
+        },
+
       ]
       children: [],
       allowed_children: {},
