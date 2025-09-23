@@ -156,6 +156,10 @@ dmx.Component('session-tracker', {
       if (!expiryCookie) {
         context.set("remaining", null);
         context._clearInterval(context);
+        dmx.nextTick(function () {
+          this.trackEvents.forEach(evt => evt.remove());
+          this.dispatchEvent("timeout");
+        }, context);
         return;
       }
       const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
