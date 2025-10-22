@@ -152,7 +152,7 @@ dmx.Component('session-tracker', {
       const idleWarnTime = context.props.idle_warn_time;
       const cookies = document.cookie.split(';').map(c => c.trim());
       const expiryCookie = cookies.find(c => c.startsWith(`${context.props.cookie_name}=`));
-      const remainingTime = parseInt(maxIdleTime - idleWarnTime);
+      const remainingTime = Math.ceil(maxIdleTime - idleWarnTime);
       if (!expiryCookie) {
         context.set("remaining", null);
         context._clearInterval(context);
@@ -162,7 +162,7 @@ dmx.Component('session-tracker', {
         }, context);
         return;
       }
-      const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+      const expiresIn = (Math.ceil(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
 
       if (expiresIn > remainingTime) {
         // User has reset during countdown
@@ -174,7 +174,7 @@ dmx.Component('session-tracker', {
 
 
       if (countdown > 0) {
-        context.set("remaining", parseInt(expiresIn));
+        context.set("remaining", Math.ceil(expiresIn));
       } else {
         context._clearInterval(context);
       }
@@ -198,7 +198,7 @@ dmx.Component('session-tracker', {
 
     const cookies = document.cookie.split(';').map(c => c.trim());
     const expiryCookie = cookies.find(c => c.startsWith(`${context.props.cookie_name}=`));
-    const remainingTime = parseInt(maxIdleTime - idleWarnTime);
+    const remainingTime = Math.ceil(maxIdleTime - idleWarnTime);
 
     let warningTimeoutTime = idleWarnTime * 1000;
     let timeoutTime = maxIdleTime * 1000;
@@ -206,14 +206,14 @@ dmx.Component('session-tracker', {
     if (expiryCookie) {
       context._clearTimers(context);
 
-      const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+      const expiresIn = (Math.ceil(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
       if (expiresIn <= remainingTime) {
         dmx.nextTick(function () {
           const cookies = document.cookie.split(';').map(c => c.trim());
           const expiryCookie = cookies.find(c => c.startsWith(`${this.props.cookie_name}=`));
-          const remainingTime = parseInt(maxIdleTime - idleWarnTime);
+          const remainingTime = Math.ceil(maxIdleTime - idleWarnTime);
           if (expiryCookie) {
-            const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+            const expiresIn = (Math.ceil(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
             if (expiresIn <= remainingTime) {
               this.set("remaining", remainingTime);
               this._setInterval(this);
@@ -227,7 +227,7 @@ dmx.Component('session-tracker', {
         timeoutTime = expiresIn * 1000;
 
       } else {
-        const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+        const expiresIn = (Math.ceil(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
         warningTimeoutTime = (expiresIn - remainingTime) * 1000;
         timeoutTime = expiresIn * 1000;
         // Show confirm at idle_warn_time
@@ -235,9 +235,9 @@ dmx.Component('session-tracker', {
           dmx.nextTick(function () {
             const cookies = document.cookie.split(';').map(c => c.trim());
             const expiryCookie = cookies.find(c => c.startsWith(`${this.props.cookie_name}=`));
-            const remainingTime = parseInt(maxIdleTime - idleWarnTime);
+            const remainingTime = Math.ceil(maxIdleTime - idleWarnTime);
             if (expiryCookie) {
-              const expiresIn = (parseInt(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
+              const expiresIn = (Math.ceil(expiryCookie.split('=')[1], 10) - Date.now()) / 1000;
               if (expiresIn <= remainingTime) {
                 this.set("remaining", remainingTime);
                 this._setInterval(this);
