@@ -58,7 +58,8 @@
             { name: 'enable_keydown', attribute: 'enable_keydown', title: 'Keydown', type: 'boolean', defaultValue: false, help: 'Enable tracking keydown events as user activity' },
             { name: 'enable_click', attribute: 'enable_click', title: 'Click', type: 'boolean', defaultValue: false, help: 'Enable tracking click events as user activity' },
             { name: 'enable_scroll', attribute: 'enable_scroll', title: 'Scroll', type: 'boolean', defaultValue: false, help: 'Enable tracking scroll events as user activity' },
-            { name: 'enable_input', attribute: 'enable_input', title: 'Input', type: 'boolean', defaultValue: false, help: 'Enable tracking input events as user activity' }
+            { name: 'enable_input', attribute: 'enable_input', title: 'Input', type: 'boolean', defaultValue: false, help: 'Enable tracking input events as user activity' },
+            { name: 'enable_popstate', attribute: 'enable_popstate', title: 'Browser Navigation (Back/Forward)', type: 'boolean', defaultValue: false, help: 'Enable tracking browser back and forward navigation as user activity' }
           ]
         }
       ],

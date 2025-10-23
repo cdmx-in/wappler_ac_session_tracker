@@ -10,6 +10,7 @@ dmx.Component('session-tracker', {
     enable_click: { type: Boolean, default: false },
     enable_scroll: { type: Boolean, default: false },
     enable_input: { type: Boolean, default: false },
+    enable_popstate: { type: Boolean, default: false },
     max_idle_time: { type: Number, default: 300 },
     idle_warn_time: { type: Number, default: 240 },
     debounce_time: { type: Number, default: 5 },
@@ -127,6 +128,14 @@ dmx.Component('session-tracker', {
         {
           'add': () => window.addEventListener('input', resetOnActivity, true),
           'remove': () => window.removeEventListener('input', resetOnActivity, true)
+        });
+    }
+
+    if (this.props.enable_popstate) {
+      this.trackEvents.push(
+        {
+          'add': () => window.addEventListener('popstate', resetOnActivity, true),
+          'remove': () => window.removeEventListener('popstate', resetOnActivity, true)
         });
     }
 
